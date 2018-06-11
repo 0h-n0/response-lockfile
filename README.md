@@ -1,8 +1,8 @@
-# django-lockfile
+# response-lockfile
 
-> Note: `Only support Linux system`.
+> Note
 
-This is because that django-lockfile uses `flock` which doesn't support Windows.
+This is because that response-lockfile uses simple one file lock system.
 
 ## Coencept
 

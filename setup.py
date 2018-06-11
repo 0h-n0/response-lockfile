@@ -11,15 +11,15 @@ def get_version(package):
     init_py = open(os.path.join(package, '__init__.py')).read()
     return re.search("__version__ = ['\"]([^'\"]+)['\"]", init_py).group(1)
 
-version = get_version('django_lockfile')
+version = get_version('response_lockfile')
 
 setuptools.setup(
-    name="django_lockfile",
+    name="response_lockfile",
     version=version,
     python_requires='>3.6.5',    
     author="Koji Ono",
     author_email="kbu94982@gmail.com",
-    description="Django Lockfile",
+    description="Response Lockfile",
     long_description=(p.parent / 'README.md').open(encoding='utf-8').read(),
     packages=setuptools.find_packages(),
     install_requires=['requests'],
