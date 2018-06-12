@@ -2,7 +2,7 @@
 
 > Note
 
-This is because that response-lockfile uses simple one file lock system.
+ Response-lockfile uses simple one file lock system.
 
 ## Coencept
 

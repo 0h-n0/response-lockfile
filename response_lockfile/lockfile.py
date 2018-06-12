@@ -193,14 +193,14 @@ class LockBase(_SharedBase):
                                    self.path)
 
     
-class SimpleLockFile(LockBase):
+class ResponseLockFile(LockBase):
     "Demonstrate Django-based locking."
     def __init__(self, name='lockfile.lock', path='.', threaded=True):
         """
         >>> lock = LockBase('somefile')
         >>> lock = LockBase('somefile', threaded=False)
         """
-        super(SimpleLockFile, self).__init__(name, path, threaded)
+        super(ResponseLockFile, self).__init__(name, path, threaded)
 
     def acquire(self):
         if self.unique_name.exists():
@@ -232,17 +232,27 @@ class SimpleLockFile(LockBase):
         if os.path.exists(self.lock_file):
             os.unlink(self.lock_file)
 
-            
+    def __enter__(self, name='lockfile.lock', path='.',
+                  threaded=True, code=None, error_type=None,
+                  status_code=None, message=None):
+        if not self.acquire():
+            the_response = Response()
+            the_response.code = code
+            the_response.error_type = error_type
+            the_response.status_code = status_code
+            the_response._content = b'f{message}'
+            return the_response
+        return self
+        
 def http_responselock(func, name='lockfile.lock', path='.',
                       threaded=True, code=None, error_type=None,
                       status_code=None, message=None):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        lockfile = SimpleLockFile(name=name,
-                                  path=path,
-                                  threaded=threaded)
+        lockfile = ResponseLockFile(name=name,
+                                    path=path,
+                                    threaded=threaded)
         acquired_flag = lockfile.acquire()
-        
         if not acquired_flag:        
             the_response = Response()
             the_response.code = code
@@ -257,14 +267,12 @@ def http_responselock(func, name='lockfile.lock', path='.',
         return rtn
     return wrapper
 
-@http_responselock
-def test():
-    time.sleep(5)
-
-@http_responselock
-def test2():
-    print('test2')
-    
-    
+with ResponseLockFile():
+    print(1)
+    @http_responselock
+    def test():
+        time.sleep(5)
+    test()
+        
 if __name__ == '__main__':
-    print(test())
+    pass
