@@ -4,7 +4,6 @@ This program is based on `pylockfile`.
 """
 import os
 import time
-import fcntl
 import socket
 import functools
 import threading
@@ -43,17 +42,6 @@ class LockTimeout(LockError):
 
     >>> try:
     ...   raise LockTimeout
-    ... except LockError:
-    ...   pass
-    """
-    pass
-
-
-class AlreadyLocked(LockError):
-    """Some other thread/process is locking the file.
-
-    >>> try:
-    ...   raise AlreadyLocked
     ... except LockError:
     ...   pass
     """
@@ -193,15 +181,31 @@ class LockBase(_SharedBase):
                                    self.path)
 
     
-class ResponseLockFile(LockBase):
-    "Demonstrate Django-based locking."
+class SimpleLockFile(LockBase):
+    "Demonstrate file-based locking."
+    root_path = '.'
+    
     def __init__(self, name='lockfile.lock', path='.', threaded=True):
         """
         >>> lock = LockBase('somefile')
         >>> lock = LockBase('somefile', threaded=False)
         """
-        super(ResponseLockFile, self).__init__(name, path, threaded)
+        if path == '.':
+            path = self.root_path
+        super(SimpleLockFile, self).__init__(name, path, threaded)
 
+    @classmethod
+    def set_root_path(cls, path):
+        cls.root_path = path
+
+    @classmethod
+    def watch(cls, name, path='.'):
+        if path == '.':
+            path = cls.root_path
+        path = Path(path).expanduser().resolve()
+        _file = path / name
+        return _file.exists()
+        
     def acquire(self):
         if self.unique_name.exists():
             return False
@@ -232,24 +236,13 @@ class ResponseLockFile(LockBase):
         if os.path.exists(self.lock_file):
             os.unlink(self.lock_file)
 
-    def __enter__(self, name='lockfile.lock', path='.',
-                  threaded=True, code=None, error_type=None,
-                  status_code=None, message=None):
-        if not self.acquire():
-            the_response = Response()
-            the_response.code = code
-            the_response.error_type = error_type
-            the_response.status_code = status_code
-            the_response._content = b'f{message}'
-            return the_response
-        return self
-        
-def http_responselock(func, name='lockfile.lock', path='.',
-                      threaded=True, code=None, error_type=None,
-                      status_code=None, message=None):
+    
+def lock_view(func, name='lockfile.lock', path='.',
+              threaded=True, code=None, error_type=None,
+              status_code=None, message=None):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        lockfile = ResponseLockFile(name=name,
+        lockfile = SimpleLockFile(name=name,
                                     path=path,
                                     threaded=threaded)
         acquired_flag = lockfile.acquire()
@@ -260,19 +253,23 @@ def http_responselock(func, name='lockfile.lock', path='.',
             the_response.status_code = status_code
             the_response._content = b'f{message}'
             return the_response
-        
         rtn = func(*args, **kwargs)
         if acquired_flag:
             lockfile.release()
         return rtn
     return wrapper
 
-with ResponseLockFile():
-    print(1)
-    @http_responselock
-    def test():
-        time.sleep(5)
-    test()
-        
-if __name__ == '__main__':
-    pass
+def watch_lockfile(func, name='lockfile.lock', path='.',
+                   code=None, error_type=None,
+                   status_code=None, message=None):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        if SimpleLockFile.watch(name=name, path=path):        
+            the_response = Response()
+            the_response.code = code
+            the_response.error_type = error_type
+            the_response.status_code = status_code
+            the_response._content = b'f{message}'
+            return the_response
+        return func(*args, **kwargs)
+    return wrapper
