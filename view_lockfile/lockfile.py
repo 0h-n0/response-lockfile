@@ -196,7 +196,10 @@ class SimpleLockFile(LockBase):
 
     @classmethod
     def set_root_path(cls, path):
-        cls.root_path = path
+        _p = Path(path).expanduser().resolve()
+        if not _p.exists():
+            raise ValueError(f'{_p} directory does not exist.')
+        cls.root_path = str(_p)
 
     @classmethod
     def watch(cls, name, path='.'):
@@ -253,9 +256,13 @@ def lock_view(func, name='lockfile.lock', path='.',
             the_response.status_code = status_code
             the_response._content = b'f{message}'
             return the_response
-        rtn = func(*args, **kwargs)
-        if acquired_flag:
-            lockfile.release()
+        try:
+            rtn = func(*args, **kwargs)
+        except Exception as e:
+            raise e
+        finally:
+            if acquired_flag:
+                lockfile.release()
         return rtn
     return wrapper
 

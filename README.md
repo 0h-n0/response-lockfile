@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/0h-n0/response-lockfile.svg?branch=master)](https://travis-ci.com/0h-n0/response-lockfile)
+
 # response-lockfile
 
 > Note
