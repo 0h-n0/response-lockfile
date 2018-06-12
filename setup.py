@@ -24,7 +24,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=['requests'],
     setup_requires=['pytest-runner'],
-    tests_require=['pytest-cov', 'pytest-html', 'pytest'],
+    tests_require=['pytest-cov', 'pytest-html', 'pytest', 'codecov'],
     classifiers=[
         'Programming Language :: Python :: 3.6',
     ],
