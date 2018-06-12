@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/0h-n0/response-lockfile.svg?branch=master)](https://travis-ci.com/0h-n0/response-lockfile)
+[![codecov](https://codecov.io/gh/0h-n0/view-lockfile/branch/master/graph/badge.svg)](https://codecov.io/gh/0h-n0/view-lockfile)
 
 # response-lockfile
 
