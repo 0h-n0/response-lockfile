@@ -1,6 +1,6 @@
 import time
-import threading
 from pathlib import Path
+from concurrent import futures
 
 import pytest
 
@@ -23,10 +23,40 @@ def test_root_path_fail_cases(root_path):
     with pytest.raises(ValueError):
         SimpleLock.set_root_path(root_path)
 
+def test_check_not_existance_lockfile_when_define_function(tmpdir):
+    # GIVEN: direcotry
+    # WHEN: a wrapped function is defined
+    # THEN: lockfile is not created
+    p = tmpdir.mkdir("sub")
+    lockfile = p / 'lockfile.lock'
+    @lock(filename='lockfile.lock', path=str(p))
+    def sleep_func():
+        pass
+    with pytest.raises(AssertionError):        
+        assert lockfile.exists()
 
-def success_func():
-    pass
-
+def test_check_collectly_create_lockfile(tmpdir):
+    # GIVEN: direcotry
+    # WHEN: a wrapped function is called
+    # THEN: lockfile is created
+    p = tmpdir.mkdir("async")
+    
+    @lock(filename='lockfile.lock', path=str(p))
+    def sleep_func():
+        time.sleep(1)
+        return True
+    def check_lockfile():
+        time.sleep(0.2)        
+        lockfile = p / 'lockfile.lock'
+        return lockfile.exists()
+    with futures.ThreadPoolExecutor(max_workers=2) as executor:
+        f1 = executor.submit(sleep_func())
+        f2 = executor.submit(check_lockfile())
+        to_do = [f1, f2]
+        results = [f.result() for f in futures.as_completed(to_do)]
+        assert results
+        
+        
 def test_check_removing_lockfile_after_occuring_exception(tmpdir):
     # GIVEN: direcotry
     # WHEN: a wrapped function throws exception
