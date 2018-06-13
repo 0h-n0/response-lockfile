@@ -23,6 +23,7 @@ def test_root_path_fail_cases(root_path):
     with pytest.raises(ValueError):
         SimpleLock.set_root_path(root_path)
 
+        
 def test_check_not_existance_lockfile_when_define_function(tmpdir):
     # GIVEN: direcotry
     # WHEN: a wrapped function is defined
@@ -75,14 +76,19 @@ def test_check_removing_lockfile_after_occuring_exception(tmpdir):
     with pytest.raises(AssertionError):
         assert lockfile.exists()
         
+def test_watch(tmpdir):
+    # GIVEN: direcotry
+    # WHEN: a lockfile exists
+    # THEN: watch wrapper returns value
+    p = tmpdir.mkdir("sub")
+    lockfile = p / 'lockfile.lock'
+    lockfile.open('w').close()
+    @watch(filename='lockfile.lock', path=str(p))
+    def wrapped_func():
+        pass
+    with pytest.raises(AssertionError):
+        assert wrapped_func(), 'a lockfile exists.'
         
-    
-        
-def test_read():
-    # GIVEN an initialized tmpfile
-    pass
-    
-    
 
     
         

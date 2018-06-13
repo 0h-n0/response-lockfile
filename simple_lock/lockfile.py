@@ -4,6 +4,7 @@ This program is based on `pylockfile`.
 """
 import os
 import socket
+import typing
 import functools
 import threading
 import contextlib
@@ -232,8 +233,11 @@ class SimpleLock(LockBase):
         if os.path.exists(self.lock_file):
             os.unlink(self.lock_file)
 
-def lock(filename='lockfile.lock', path='.',
-         threaded=True):
+def lock(filename='lockfile.lock',
+         path='.',
+         threaded=True,
+         return_value: typing.Callable = None,
+         **return_func_kwargs):
     def decorate(func):
         @functools.wraps(func)        
         def wrapper(*args, **kwargs):
@@ -248,26 +252,32 @@ def lock(filename='lockfile.lock', path='.',
             finally:
                 if acquired_flag:
                     lockfile.release()
+                else:
+                    if lock_return is not None:
+                        if callalbe(lock_return):
+                            return lock_return(**return_func_kwargs)
+                        else:
+                            return lock_retrun
             return rtn
         return wrapper
     return decorate
 
-
-def watch(filename='lockfile.lock', path='.',
-          threaded=True):
+def watch(filename='lockfile.lock',
+          path='.',
+          threaded=True,
+          lock_return: typing.Callable = None,
+          **lock_return_kwargs):
     def decorate(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             if SimpleLock.watch(filename=filename, path=path):
-                the_response = None
-                return the_response
+                if lock_return is not None:
+                    if callalbe(lock_return):
+                        return lock_return(**return_func_kwargs)
+                    else:
+                        return lock_retrun
+                return False
             return func(*args, **kwargs)
         return wrapper
     return decorate
 
-if __name__ == '__main__':
-    import time
-    @lock()
-    def sleep_func():
-        time.sleep(20)
-    sleep_func()
