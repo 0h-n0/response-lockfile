@@ -26,7 +26,7 @@ before_deploy:
 
 deploy:
   provider: pypi
-  user: KojiOno
+  user: 0h-n0
   password:
     secure: vJ0eSbTNa0rR0eXJyASCn3XY30M/7MWMuDm/lt2brVtlDmuQA+gpdpIql3fdpTVkLROV5jwVCZa/LjGeBLYEO9ALQHOc7h1glYupHLVqPlMYj+UMw79k6CHfCoJs2I5mAhF+24LWva20nqraQpaobCGFBvwKsSpt15n6idYVAdwFCkLom5wFlNUsDSaIaXONXtXnnCC0pw5bBpOKkppBXSYKr2T9oyis9MZkymJqC6UBMZSE+ezQEdnyJJ45CtO4G+5C5+gTNmIgzIPajOiKbN7ndxNiayjCdkaQ06IwhcjTUBQEiUJLiOjVxKRDq4XyrMYRyrS64NAkT
   on:
