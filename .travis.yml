@@ -33,6 +33,8 @@ deploy:
     repo: 0h-n0/simple-lock
     python: 3.6
     branch: master
+    tags: true
+    
   distributions: dists
   skip_cleanup: true
   skip_upload_docs: true
