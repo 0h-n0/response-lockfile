@@ -20,9 +20,12 @@ script:
 - python setup.py test
 after_success:
 - codecov -t eba8ff07-c98a-4805-96c0-33b1a815fe0b
-- "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
+- "./cc-test-reporter after-build"
+before_deploy:
+- pip install twine  
+
 deploy:
   provider: pypi
   user: KojiOno
   password:
-    secure: vJ0eSbTNa0rR0eXJyASCn3XY30M/7MWMuDm/lt2brVtlDmuQA+gpdpIql3fdpTVkLROV5jwVCZa/LjGeBLYEO9ALQHOc7h1glYupHLVqPlMYj+UMw79k6CHfCoJs2I5mAhF+24LWva20nqraQpaobCGFBvwKsSpt15n6idYVAdwFCkLom5wFlNUsDSaIaXONXtXnnCC0pw5bBpOKkppBXSYKr2T9oyis9MZkymJqC6UBMZSE+ezQEdnyJJ45CtO4G+5C5+gTNmIgzIPajOiKbN7ndxNiayjCdkaQ06IwhcjTUBQEiUJLiOjVxKRDq4XyrMYRyrS64NAkT8drbusW91KomcvzhZ3WXahV/Zt+a+YgNXuEZUmhc02ksOfAwWjEiVp8Ln2RoARXgIn1ceG5xhwTm3YWF3BYZPGQldutpKpI1qX8/fd6UNBMmCeBt++LcU+hA0K1psmkyURCiNn8KO2mjd1yIJQGfPFg2Z0kroiwHbjdMUKIElbRtdo43ujbtBmNMPfqdbwGClt6ZGd7N7eLbUb8vhVBvdf3Yeh/XkE/UbbjeWelmTttA6l7HAKrKVaRBuWfGF4/BRw6NinfX2Q3BjqQBSgt6GfEcjh4HQxsHvMxRvRmcZSL5vPZrMZ2/NTZ4yO1/BK9ULDM0x2VcL2Vnlgj23Wt2RDOvzBUo7g=
+    secure: vJ0eSbTNa0rR0eXJyASCn3XY30M/7MWMuDm/lt2brVtlDmuQA+gpdpIql3fdpTVkLROV5jwVCZa/LjGeBLYEO9ALQHOc7h1glYupHLVqPlMYj+UMw79k6CHfCoJs2I5mAhF+24LWva20nqraQpaobCGFBvwKsSpt15n6idYVAdwFCkLom5wFlNUsDSaIaXONXtXnnCC0pw5bBpOKkppBXSYKr2T9oyis9MZkymJqC6UBMZSE+ezQEdnyJJ45CtO4G+5C5+gTNmIgzIPajOiKbN7ndxNiayjCdkaQ06IwhcjTUBQEiUJLiOjVxKRDq4XyrMYRyrS64NAkT

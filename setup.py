@@ -20,6 +20,7 @@ setuptools.setup(
     author="Koji Ono",
     author_email="kbu94982@gmail.com",
     description="Simple Lockfile System.",
+    url='https://github.com/0h-n0/simple-lock',
     long_description=open(os.path.join(p, 'README.md')).read(),
     packages=setuptools.find_packages(),
     install_requires=['requests'],
