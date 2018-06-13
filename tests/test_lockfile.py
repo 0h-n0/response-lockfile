@@ -43,19 +43,21 @@ def test_check_collectly_create_lockfile(tmpdir):
     
     @lock(filename='lockfile.lock', path=str(p))
     def sleep_func():
-        time.sleep(1)
-        return True
+        time.sleep(0.5)
+        return (True, 'sleep')
     def check_lockfile():
         time.sleep(0.2)        
         lockfile = p / 'lockfile.lock'
-        return lockfile.exists()
+        return (lockfile.exists(), 'check_lockfile')
     with futures.ThreadPoolExecutor(max_workers=2) as executor:
-        f1 = executor.submit(sleep_func())
-        f2 = executor.submit(check_lockfile())
-        to_do = [f1, f2]
-        results = [f.result() for f in futures.as_completed(to_do)]
-        assert results
-        
+        funcs = [sleep_func, check_lockfile]
+        to_do = [executor.submit(f) for f in funcs]
+        done = [f.done() for f in futures.as_completed(to_do)]
+        while True:
+            if all(done):
+                break
+        results = [f.result()[0] for f in futures.as_completed(to_do)]
+        assert all(results)
         
 def test_check_removing_lockfile_after_occuring_exception(tmpdir):
     # GIVEN: direcotry
@@ -72,8 +74,6 @@ def test_check_removing_lockfile_after_occuring_exception(tmpdir):
     lockfile = p / 'lockfile.lock'
     with pytest.raises(AssertionError):
         assert lockfile.exists()
-        
-        
         
         
     

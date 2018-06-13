@@ -3,7 +3,6 @@ This program is based on `pylockfile`.
 
 """
 import os
-import time
 import socket
 import functools
 import threading
@@ -235,23 +234,23 @@ class SimpleLock(LockBase):
 
 def lock(filename='lockfile.lock', path='.',
          threaded=True):
-    lockfile = SimpleLock(filename=filename,
-                          path=path,
-                          threaded=threaded)
-    acquired_flag = lockfile.acquire()
     def decorate(func):
         @functools.wraps(func)        
         def wrapper(*args, **kwargs):
-            return func(*args, **kwargs)
+            lockfile = SimpleLock(filename=filename,
+                                  path=path,
+                                  threaded=threaded)
+            acquired_flag = lockfile.acquire()
+            try:
+                rtn = func(*args, **kwargs)            
+            except Exception as e:
+                raise e
+            finally:
+                if acquired_flag:
+                    lockfile.release()
+            return rtn
         return wrapper
-    try:
-        _decorate = decorate
-    except Exception as e:
-        raise e
-    finally:
-        if acquired_flag:
-            lockfile.release()
-    return _decorate
+    return decorate
 
 
 def watch(filename='lockfile.lock', path='.',
@@ -265,3 +264,10 @@ def watch(filename='lockfile.lock', path='.',
             return func(*args, **kwargs)
         return wrapper
     return decorate
+
+if __name__ == '__main__':
+    import time
+    @lock()
+    def sleep_func():
+        time.sleep(20)
+    sleep_func()
