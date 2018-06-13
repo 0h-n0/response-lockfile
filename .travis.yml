@@ -29,6 +29,8 @@ deploy:
   password:
     secure: F1NDTgz35hgSxhYKJXrb8CrzbVEMMm9yR+qOezQjxRc1FxVcgmZLlPeKQ0K/p2i4BFwIl181ur6FergjWtAMw35AOudIBQca+fMvooeUbH9BP5MCAkDZIKUud0GXIGnvSLaWH9KMB/X3OI4M2Jpjh4dgi5mmh0PRjR5cICLRBgtZY8g0HzXn1K1DuPgOR8lyW2YPg0kPgsmTpQmf7Nimkka9LSdxgftCZYhDTxZ3xG36lyJjYNsxaJr/E0EKw3v1Y3Siok4gwoQARL6mBYnwk2+hpJfPNC83WZWEbXTIoU6rp6f8XkAtVYvQ096ie7NY4h+gmyJgiHV0l26cCuIRM0hGrl/ia9Cx05Hl+u2qhzldxaoG2d+/7spL4rW15vPJSH+fa3843w3JzCFMl1baDDRwmXtExcJ9ia69WH3qyQ3pAyd1VlTJfR1ZQ+AqyN7Bz3fSvzDU+9bwqGyKrKeK+hJxs0akW8M7w1wSHDFr2kDUOuG+OdOALem0TLwnRRJDrHA5GpkSdnsDOkguye0woP6Qq0AcJpNlXmj3I26tVkJobDVBiSiqFk4MGC7Im0m8HnTsVdZYRAwQW03NEXsCA2dIRJVGjXwwhfciRGRUItSWq1ArJcoJLRn93VuH79m8Jfdg58N5LEVAZyeGh4U1ZFHgrgJf7DykBvGtFFUN69s=
   on:
+    repo: 0h-n0/simple-lock
+    python: 3.6
     branch: master
   distributions: dists
   skip_cleanup: true
