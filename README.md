@@ -1,5 +1,5 @@
 [![LICENCE](https://img.shields.io/badge/LICENCE-MIT-brightgreen.svg)](https://github.com/0h-n0/simple-lock)
-[![PYTHON version](https://img.shields.io/badge/python-3.6-blue.svg)](https://github.com/0h-n0/simple-lock)
+[![PYTHON version](https://img.shields.io/badge/python-3.5,3.6-blue.svg)](https://github.com/0h-n0/simple-lock)
 [![PyPI version](https://badge.fury.io/py/simple-lock.svg)](https://badge.fury.io/py/simple-lock)
 [![Build Status](https://travis-ci.org/0h-n0/simple-lock.svg?branch=master)](https://travis-ci.org/0h-n0/simple-lock)
 [![codecov](https://codecov.io/gh/0h-n0/view-lockfile/branch/master/graph/badge.svg)](https://codecov.io/gh/0h-n0/view-lockfile)

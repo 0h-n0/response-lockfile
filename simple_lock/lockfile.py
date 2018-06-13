@@ -178,28 +178,29 @@ class SimpleLock(LockBase):
     "Demonstrate file-based locking."
     root_path = '.'
     
-    def __init__(self, name='lockfile.lock', path='.', threaded=True):
+    def __init__(self, filename='lockfile.lock', path='.', threaded=True):
         """
         >>> lock = LockBase('somefile')
         >>> lock = LockBase('somefile', threaded=False)
         """
         if path == '.':
             path = self.root_path
-        super().__init__(name, path, threaded)
+        super().__init__(filename, path, threaded)
 
     @classmethod
     def set_root_path(cls, path):
-        _p = Path(path).expanduser().resolve()
+        _p = Path(path).expanduser()
         if not _p.exists():
             raise ValueError('{} directory does not exist.'.format(_p))
+        _p = _p.resolve()
         cls.root_path = str(_p)
 
     @classmethod
-    def watch(cls, name, path='.'):
+    def watch(cls, filename, path='.'):
         if path == '.':
             path = cls.root_path
         path = Path(path).expanduser().resolve()
-        _file = path / name
+        _file = path / filename
         return _file.exists()
         
     def acquire(self):
@@ -216,7 +217,7 @@ class SimpleLock(LockBase):
     def release(self):
         if not self.is_locked():
             raise NotLocked("%s is not locked" % self.lockfile)
-        elif not os.path.exists(self.lockfile):
+        elif not os.path.exists(str(self.lockfile)):
             raise NotMyLock("%s is locked, but not by me" % self.lockfile)
         self.lockfile.unlink()
 
@@ -232,36 +233,35 @@ class SimpleLock(LockBase):
         if os.path.exists(self.lock_file):
             os.unlink(self.lock_file)
 
-def lock(name='lockfile.lock', path='.',
-         threaded=True, func=None, *dargs, **dkwargs):
+def lock(filename='lockfile.lock', path='.',
+         threaded=True):
+    lockfile = SimpleLock(filename=filename,
+                          path=path,
+                          threaded=threaded)
+    acquired_flag = lockfile.acquire()
     def decorate(func):
+        @functools.wraps(func)        
         def wrapper(*args, **kwargs):
-            lockfile = SimpleLock(name=name,
-                                  path=path,
-                                  threaded=threaded)
-            acquired_flag = lockfile.acquire()
-            try:
-                rtn = func(*args, **kwargs)
-            except Exception as e:
-                raise e
-            finally:
-                if acquired_flag:
-                    lockfile.release()
-            return rtn
+            return func(*args, **kwargs)
+        return wrapper
+    try:
+        _decorate = decorate
+    except Exception as e:
+        raise e
+    finally:
+        if acquired_flag:
+            lockfile.release()
+    return _decorate
+
+
+def watch(filename='lockfile.lock', path='.',
+          threaded=True):
+    def decorate(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            if SimpleLock.watch(filename=filename, path=path):
+                the_response = None
+                return the_response
+            return func(*args, **kwargs)
         return wrapper
     return decorate
-
-def watch(func, name='lockfile.lock', path='.',
-                   code=None, error_type=None,
-                   status_code=None, message=None):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        if SimpleLock.watch(name=name, path=path):        
-            the_response = Response()
-            the_response.code = code
-            the_response.error_type = error_type
-            the_response.status_code = status_code
-            the_response._content = b'f{message}'
-            return the_response
-        return func(*args, **kwargs)
-    return wrapper

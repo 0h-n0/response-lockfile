@@ -1,3 +1,5 @@
+import time
+import threading
 from pathlib import Path
 
 import pytest
@@ -20,7 +22,6 @@ fail_root_pathes = ['/hoge/hoge', '/hoge/~/hoge']
 def test_root_path_fail_cases(root_path):
     with pytest.raises(ValueError):
         SimpleLock.set_root_path(root_path)
-
 
 
 def success_func():
