@@ -1,5 +1,5 @@
 [![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg)](https://pypi.python.org/pypi/ansicolortags/)
-[![Build Status](https://travis-ci.com/0h-n0/simple-lock.svg?branch=master)](https://travis-ci.com/0h-n0/simple-lock)
+[![Build Status](https://travis-ci.org/0h-n0/simple-lock.svg?branch=master)](https://travis-ci.org/0h-n0/simple-lock)
 [![codecov](https://codecov.io/gh/0h-n0/view-lockfile/branch/master/graph/badge.svg)](https://codecov.io/gh/0h-n0/view-lockfile)
 [![Maintainability](https://api.codeclimate.com/v1/badges/9a8b4b39d3673ccb6db6/maintainability)](https://codeclimate.com/github/0h-n0/simple-lock/maintainability)
 
@@ -54,3 +54,4 @@ def view():
 
 If lockfile1.lock exists when execute app2/view:view, this decoreator returns a http response.
 
+ 
