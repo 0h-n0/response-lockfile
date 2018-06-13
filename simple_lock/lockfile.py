@@ -191,7 +191,7 @@ class SimpleLock(LockBase):
     def set_root_path(cls, path):
         _p = Path(path).expanduser().resolve()
         if not _p.exists():
-            raise ValueError(f'{_p} directory does not exist.')
+            raise ValueError('{} directory does not exist.'.format(_p))
         cls.root_path = str(_p)
 
     @classmethod
@@ -207,7 +207,7 @@ class SimpleLock(LockBase):
             return False
         try:
             _fp = self.lockfile.open("w")
-            _fp.write(f'{self.hostname}\n{self.pid}\n')
+            _fp.write('{}\n{}\n'.format(self.hostname, self.pid))
             _fp.close()
         except IOError:
             raise LockFailed("failed to create %s" % self.lockfile)
