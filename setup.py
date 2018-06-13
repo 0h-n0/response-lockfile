@@ -1,8 +1,8 @@
 import os
 import re
 import setuptools
-from pathlib import Path
-p = Path(__file__)
+
+p = os.path.dirname(os.path.abspath(__file__))
 
 def get_version(package):
     """
@@ -20,7 +20,8 @@ setuptools.setup(
     author="Koji Ono",
     author_email="kbu94982@gmail.com",
     description="Simple Lockfile System.",
-    long_description=(p.parent / 'README.md').open(encoding='utf-8').read(),
+    long_description=open(os.path.join(p, 'README.md'),
+                          encoding='utf-8').read(),
     packages=setuptools.find_packages(),
     install_requires=['requests'],
     setup_requires=['pytest-runner'],
