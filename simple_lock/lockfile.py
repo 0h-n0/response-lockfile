@@ -149,14 +149,7 @@ class LockBase(_SharedBase):
         else:
             self.tname = ""
 
-        # unique name is mostly about the current process, but must
-        # also contain the path -- otherwise, two adjacent locked
-        # files conflict (one file gets locked, creating lock-file and
-        # unique file, the other one gets locked, creating lock-file
-        # and overwriting the already existing lock-file, then one
-        # gets unlocked, deleting both lock-file and unique file,
-        # finally the last lock errors out upon releasing.
-        self.unique_name = self.path / self.name
+        self.lockfile = self.path / self.name
 
     def is_locked(self):
         """
@@ -177,11 +170,11 @@ class LockBase(_SharedBase):
         raise NotImplemented("implement in subclass")
 
     def __repr__(self):
-        return "<%s: %r -- %r>" % (self.__class__.__name__, self.unique_name,
+        return "<%s: %r -- %r>" % (self.__class__.__name__, self.lockfile,
                                    self.path)
 
     
-class SimpleLockFile(LockBase):
+class SimpleLock(LockBase):
     "Demonstrate file-based locking."
     root_path = '.'
     
@@ -192,7 +185,7 @@ class SimpleLockFile(LockBase):
         """
         if path == '.':
             path = self.root_path
-        super(SimpleLockFile, self).__init__(name, path, threaded)
+        super().__init__(name, path, threaded)
 
     @classmethod
     def set_root_path(cls, path):
@@ -210,68 +203,60 @@ class SimpleLockFile(LockBase):
         return _file.exists()
         
     def acquire(self):
-        if self.unique_name.exists():
+        if self.is_locked():
             return False
         try:
-            _fp = self.unique_name.open("w")
+            _fp = self.lockfile.open("w")
             _fp.write(f'{self.hostname}\n{self.pid}\n')
             _fp.close()
         except IOError:
-            raise LockFailed("failed to create %s" % self.unique_name)
+            raise LockFailed("failed to create %s" % self.lockfile)
         return True
 
     def release(self):
         if not self.is_locked():
-            raise NotLocked("%s is not locked" % self.unique_name)
-        elif not os.path.exists(self.unique_name):
-            raise NotMyLock("%s is locked, but not by me" % self.unique_name)
-        self.unique_name.unlink()
+            raise NotLocked("%s is not locked" % self.lockfile)
+        elif not os.path.exists(self.lockfile):
+            raise NotMyLock("%s is locked, but not by me" % self.lockfile)
+        self.lockfile.unlink()
 
     def is_locked(self):
-        return os.path.exists(self.unique_name)
+        return self.lockfile.exists()
 
     def i_am_locking(self):
         return (self.is_locked() and
-                os.path.exists(self.unique_name) and
-                os.stat(self.unique_name).st_nlink == 2)
+                self.lockfile.exists() and
+                self.lockfile.stat().st_nlink == 2)
 
     def break_lock(self):
         if os.path.exists(self.lock_file):
             os.unlink(self.lock_file)
 
-    
-def lock_view(func, name='lockfile.lock', path='.',
-              threaded=True, code=None, error_type=None,
-              status_code=None, message=None):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        lockfile = SimpleLockFile(name=name,
-                                    path=path,
-                                    threaded=threaded)
-        acquired_flag = lockfile.acquire()
-        if not acquired_flag:        
-            the_response = Response()
-            the_response.code = code
-            the_response.error_type = error_type
-            the_response.status_code = status_code
-            the_response._content = b'f{message}'
-            return the_response
-        try:
-            rtn = func(*args, **kwargs)
-        except Exception as e:
-            raise e
-        finally:
-            if acquired_flag:
-                lockfile.release()
-        return rtn
-    return wrapper
+def lock(name='lockfile.lock', path='.',
+         threaded=True, func=None, *dargs, **dkwargs):
+    def decorate(func):
+        def wrapper(*args, **kwargs):
+            lockfile = SimpleLock(name=name,
+                                  path=path,
+                                  threaded=threaded)
+            acquired_flag = lockfile.acquire()
+            try:
+                rtn = func(*args, **kwargs)
+            except Exception as e:
+                raise e
+            finally:
+                if acquired_flag:
+                    lockfile.release()
+            return rtn
+        return wrapper
+    return decorate
 
-def watch_lockfile(func, name='lockfile.lock', path='.',
+def watch(func, name='lockfile.lock', path='.',
                    code=None, error_type=None,
                    status_code=None, message=None):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        if SimpleLockFile.watch(name=name, path=path):        
+        if SimpleLock.watch(name=name, path=path):        
             the_response = Response()
             the_response.code = code
             the_response.error_type = error_type

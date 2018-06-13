@@ -6,14 +6,24 @@ os:
 python:
   - 3.6
 
+env:
+  global:
+    - CC_TEST_REPORTER_ID=dbfa270b2ada12e39850e920a0dc3235eb6512c90b56d4a1ebeabd184d2cf914
+    
 install:
   - python -m pip install virtualenv
   - virtualenv test
   - source test/bin/activate
   - python setup.py install  
 
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+  
 script:
   - python setup.py test
 
 after_success:
-  - codecov
+  - codecov -t eba8ff07-c98a-4805-96c0-33b1a815fe0b
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

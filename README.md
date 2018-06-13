@@ -1,18 +1,14 @@
 [![Build Status](https://travis-ci.com/0h-n0/response-lockfile.svg?branch=master)](https://travis-ci.com/0h-n0/response-lockfile)
 [![codecov](https://codecov.io/gh/0h-n0/view-lockfile/branch/master/graph/badge.svg)](https://codecov.io/gh/0h-n0/view-lockfile)
+[![Maintainability](https://api.codeclimate.com/v1/badges/9a8b4b39d3673ccb6db6/maintainability)](https://codeclimate.com/github/0h-n0/simple-lock/maintainability)
 
-# response-lockfile
+# simple-lock
 
 > Note
 
- Response-lockfile adapts 'one file lock system'.
+ Simple-lockfile uses a file as a lock system.
 
 ## Coencept
-
-
-## Dependencies
-
-- requrests
 
 ## How to use
 
@@ -20,11 +16,11 @@ The following example is based on Django project. With this module, you can lock
 
 ```settings.py
 
-from response_lockfile import ReponseLockFile
+from simple_lock import SimpleLock
 
 # ~~~
 
-ResponseLockFile.set_root_path('/home/hoge/')
+File.set_root_path('/home/hoge/')
 # A lockfile is created in the root_path directory without setting path as arguments.
 
 ```
