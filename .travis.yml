@@ -3,6 +3,7 @@ os:
 - linux
 python:
 - 3.6
+- 3.5
 env:
   global:
   - CC_TEST_REPORTER_ID=dbfa270b2ada12e39850e920a0dc3235eb6512c90b56d4a1ebeabd184d2cf914
