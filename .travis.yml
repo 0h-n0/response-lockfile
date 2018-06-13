@@ -4,12 +4,17 @@ os:
   - linux
 
 python:
-  - 3.6.0  
+  - 3.0
+  - 3.1  
+  - 3.2
+  - 3.4
+  - 3.5
+  - 3.6.0
   - 3.6.1
-  - 3.6.2  
+  - 3.6.2
   - 3.6.3
-  - 3.6.4  
-  - 3.6.5
+  - 3.6.4
+  - 3.6.5  
 
 env:
   global:
@@ -32,3 +37,9 @@ script:
 after_success:
   - codecov -t eba8ff07-c98a-4805-96c0-33b1a815fe0b
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+
+deploy:
+  provider: pypi
+  user: "KojiOno"
+  password:
+
