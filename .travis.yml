@@ -22,15 +22,14 @@ after_success:
 - codecov -t eba8ff07-c98a-4805-96c0-33b1a815fe0b
 - "./cc-test-reporter after-build"
 before_deploy:
-  - pip install twine    
-
+- pip install twine
 deploy:
   provider: pypi
   user: 0h-n0
   password:
-    secure: vJ0eSbTNa0rR0eXJyASCn3XY30M/7MWMuDm/lt2brVtlDmuQA+gpdpIql3fdpTVkLROV5jwVCZa/LjGeBLYEO9ALQHOc7h1glYupHLVqPlMYj+UMw79k6CHfCoJs2I5mAhF+24LWva20nqraQpaobCGFBvwKsSpt15n6idYVAdwFCkLom5wFlNUsDSaIaXONXtXnnCC0pw5bBpOKkppBXSYKr2T9oyis9MZkymJqC6UBMZSE+ezQEdnyJJ45CtO4G+5C5+gTNmIgzIPajOiKbN7ndxNiayjCdkaQ06IwhcjTUBQEiUJLiOjVxKRDq4XyrMYRyrS64NAkT
+    secure: F1NDTgz35hgSxhYKJXrb8CrzbVEMMm9yR+qOezQjxRc1FxVcgmZLlPeKQ0K/p2i4BFwIl181ur6FergjWtAMw35AOudIBQca+fMvooeUbH9BP5MCAkDZIKUud0GXIGnvSLaWH9KMB/X3OI4M2Jpjh4dgi5mmh0PRjR5cICLRBgtZY8g0HzXn1K1DuPgOR8lyW2YPg0kPgsmTpQmf7Nimkka9LSdxgftCZYhDTxZ3xG36lyJjYNsxaJr/E0EKw3v1Y3Siok4gwoQARL6mBYnwk2+hpJfPNC83WZWEbXTIoU6rp6f8XkAtVYvQ096ie7NY4h+gmyJgiHV0l26cCuIRM0hGrl/ia9Cx05Hl+u2qhzldxaoG2d+/7spL4rW15vPJSH+fa3843w3JzCFMl1baDDRwmXtExcJ9ia69WH3qyQ3pAyd1VlTJfR1ZQ+AqyN7Bz3fSvzDU+9bwqGyKrKeK+hJxs0akW8M7w1wSHDFr2kDUOuG+OdOALem0TLwnRRJDrHA5GpkSdnsDOkguye0woP6Qq0AcJpNlXmj3I26tVkJobDVBiSiqFk4MGC7Im0m8HnTsVdZYRAwQW03NEXsCA2dIRJVGjXwwhfciRGRUItSWq1ArJcoJLRn93VuH79m8Jfdg58N5LEVAZyeGh4U1ZFHgrgJf7DykBvGtFFUN69s=
   on:
     branch: master
   distributions: dists
   skip_cleanup: true
-  skip_upload_docs: true    
+  skip_upload_docs: true
