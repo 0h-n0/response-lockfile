@@ -20,6 +20,7 @@ before_script:
 script:
 - python setup.py test
 after_success:
+- coveralls  
 - codecov -t eba8ff07-c98a-4805-96c0-33b1a815fe0b
 - "./cc-test-reporter after-build"
 before_deploy:
