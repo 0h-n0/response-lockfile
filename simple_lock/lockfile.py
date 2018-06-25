@@ -10,8 +10,6 @@ import threading
 import contextlib
 from pathlib import Path
 
-from requests.models import Response
-
 
 class Error(Exception):
     """
@@ -130,16 +128,17 @@ class _SharedBase(object):
 
 class LockBase(_SharedBase):
     """Base class for platform-specific lock classes."""
-    def __init__(self, name, path, threaded=True):
+    def __init__(self, name, path, threaded=True, delimiter='_-_-_'):
         """
         >>> lock = LockBase('somefile')
         >>> lock = LockBase('somefile', threaded=False)
         """
         super(LockBase, self).__init__(path)
-        self.name = name
-        self.path = Path(path).expanduser().resolve()
+        self.name = name        
+        self.path = Path(path).expanduser().resolve()        
         self.hostname = socket.gethostname()
         self.pid = os.getpid()
+        self.delimiter = delimiter
         if threaded:
             t = threading.current_thread()
             # Thread objects in Python 2.4 and earlier do not have ident
@@ -149,7 +148,11 @@ class LockBase(_SharedBase):
         else:
             self.tname = ""
 
-        self.lockfile = self.path / self.name
+        _foramt = '{name}{delimiter}{hostname}{delimiter}{pid}'
+        self.lockfile = self.path / (_foramt.format(name=self.name,
+                                                    delimiter=self.delimiter,
+                                                    hostname=self.hostname,
+                                                    pid=self.pid))
 
     def is_locked(self):
         """
@@ -178,7 +181,7 @@ class SimpleLock(LockBase):
     "Demonstrate file-based locking."
     root_path = '.'
     
-    def __init__(self, filename='lockfile.lock', path='.', threaded=True):
+    def __init__(self, filename='simple.lock', path='.', threaded=True):
         """
         >>> lock = LockBase('somefile')
         >>> lock = LockBase('somefile', threaded=False)
@@ -200,16 +203,14 @@ class SimpleLock(LockBase):
         if path == '.':
             path = cls.root_path
         path = Path(path).expanduser().resolve()
-        _file = path / filename
-        return _file.exists()
+        _files = list(path.glob(filename + "*"))
+        return bool(_files)
         
     def acquire(self):
         if self.is_locked():
             return False
         try:
-            _fp = self.lockfile.open("w")
-            _fp.write('{}\n{}\n'.format(self.hostname, self.pid))
-            _fp.close()
+            with self.lockfile.open("w"): pass
         except IOError:
             raise LockFailed("failed to create %s" % self.lockfile)
         return True
@@ -222,7 +223,9 @@ class SimpleLock(LockBase):
         self.lockfile.unlink()
 
     def is_locked(self):
-        return self.lockfile.exists()
+        path = Path(self.root_path).expanduser().resolve()
+        _files = list(path.glob(str(self.name) + self.delimiter + "*"))
+        return bool(_files)
 
     def i_am_locking(self):
         return (self.is_locked() and
@@ -233,7 +236,7 @@ class SimpleLock(LockBase):
         if os.path.exists(self.lock_file):
             os.unlink(self.lock_file)
 
-def lock(filename='lockfile.lock',
+def lock(filename='simple.lock',
          path='.',
          threaded=True,
          return_value: typing.Callable = None,
@@ -246,7 +249,7 @@ def lock(filename='lockfile.lock',
                                   threaded=threaded)
             acquired_flag = lockfile.acquire()
             try:
-                rtn = func(*args, **kwargs)            
+                rtn = func(*args, **kwargs)
             except Exception as e:
                 raise e
             finally:
@@ -254,7 +257,7 @@ def lock(filename='lockfile.lock',
                     lockfile.release()
                 else:
                     if lock_return is not None:
-                        if callalbe(lock_return):
+                        if callable(lock_return):
                             return lock_return(**return_func_kwargs)
                         else:
                             return lock_retrun
@@ -262,22 +265,21 @@ def lock(filename='lockfile.lock',
         return wrapper
     return decorate
 
-def watch(filename='lockfile.lock',
+def watch(filename='simple.lock',
           path='.',
           threaded=True,
-          lock_return: typing.Callable = None,
-          **lock_return_kwargs):
+          return_value: typing.Callable = None,
+          **return_func_kwargs):
     def decorate(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             if SimpleLock.watch(filename=filename, path=path):
-                if lock_return is not None:
-                    if callalbe(lock_return):
-                        return lock_return(**return_func_kwargs)
+                if return_value is not None:
+                    if callable(return_value):
+                        return return_value(**return_func_kwargs)
                     else:
-                        return lock_retrun
+                        return return_value
                 return False
             return func(*args, **kwargs)
         return wrapper
     return decorate
-
