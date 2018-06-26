@@ -41,15 +41,17 @@ def test_check_collectly_create_lockfile(tmpdir):
     # WHEN: a wrapped function is called
     # THEN: lockfile is created
     p = tmpdir.mkdir("async")
-    
+    p = Path(str(p))
     @lock(filename='lockfile.lock', path=str(p))
     def sleep_func():
         time.sleep(0.5)
         return (True, 'sleep')
+    
     def check_lockfile():
-        time.sleep(0.2)        
-        lockfile = p / 'lockfile.lock'
-        return (lockfile.exists(), 'check_lockfile')
+        time.sleep(0.2)
+        _files = list(p.glob('lockfile.lock' + "*"))
+        return (bool(_files), 'check_lockfile')
+    
     with futures.ThreadPoolExecutor(max_workers=2) as executor:
         funcs = [sleep_func, check_lockfile]
         to_do = [executor.submit(f) for f in funcs]
@@ -81,8 +83,7 @@ def test_watch(tmpdir):
     # WHEN: a lockfile exists
     # THEN: watch wrapper returns value
     p = tmpdir.mkdir("sub")
-    lockfile = p / 'lockfile.lock'
-    lockfile.open('w').close()
+    with (p / 'lockfile.lock').open('w') as fp: pass
     @watch(filename='lockfile.lock', path=str(p))
     def wrapped_func():
         pass

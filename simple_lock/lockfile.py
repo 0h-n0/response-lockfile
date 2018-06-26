@@ -223,7 +223,7 @@ class SimpleLock(LockBase):
         self.lockfile.unlink()
 
     def is_locked(self):
-        path = Path(self.root_path).expanduser().resolve()
+        path = Path(self.lockfile).parent
         _files = list(path.glob(str(self.name) + self.delimiter + "*"))
         return bool(_files)
 
