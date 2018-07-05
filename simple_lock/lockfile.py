@@ -215,7 +215,7 @@ class SimpleLock(LockBase):
             path = cls.root_path
         path = Path(path).expanduser().resolve()
         hostname = socket.gethostname()
-        for ifile in path.glob(filename + "*"):
+        for ifile in path.glob(filename + cls.delimiter + "*"):
             _hostname = ifile.name.split(cls.delimiter)[1]
             pid = ifile.name.split(cls.delimiter)[2]
             if hostname == _hostname:
