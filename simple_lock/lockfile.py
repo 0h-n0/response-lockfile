@@ -8,6 +8,7 @@ import typing
 import functools
 import threading
 import contextlib
+import subprocess
 from pathlib import Path
 
 
@@ -128,6 +129,7 @@ class _SharedBase(object):
 
 class LockBase(_SharedBase):
     """Base class for platform-specific lock classes."""
+    delimiter = '_-_-_'
     def __init__(self, name, path, threaded=True, delimiter='_-_-_'):
         """
         >>> lock = LockBase('somefile')
@@ -200,13 +202,30 @@ class SimpleLock(LockBase):
 
     @classmethod
     def watch(cls, filename, path='.'):
+        cls.clean(filename, path)
         if path == '.':
             path = cls.root_path
         path = Path(path).expanduser().resolve()
         _files = list(path.glob(filename + "*"))
         return bool(_files)
+
+    @classmethod
+    def clean(cls, filename, path='.'):
+        if path == '.':
+            path = cls.root_path
+        path = Path(path).expanduser().resolve()
+        hostname = socket.gethostname()
+        for ifile in path.glob(filename + "*"):
+            _hostname = ifile.name.split(cls.delimiter)[1]
+            pid = ifile.name.split(cls.delimiter)[2]
+            if hostname == _hostname:
+                p = subprocess.run(["ps -ero pid"], stdout=subprocess.PIPE,
+                                    shell=True, check=True, universal_newlines=True)
+                if not pid in p.stdout.split():
+                    ifile.unlink()
         
     def acquire(self):
+        self.clean(self.name, self.path)
         if self.is_locked():
             return False
         try:
@@ -249,18 +268,21 @@ def lock(filename='simple.lock',
                                   threaded=threaded)
             acquired_flag = lockfile.acquire()
             try:
-                rtn = func(*args, **kwargs)
+                if acquired_flag:
+                    rtn = func(*args, **kwargs)
             except Exception as e:
                 raise e
             finally:
                 if acquired_flag:
                     lockfile.release()
                 else:
-                    if lock_return is not None:
-                        if callable(lock_return):
-                            return lock_return(**return_func_kwargs)
+                    if return_value is not None:
+                        if callable(return_value):
+                            return return_value(**return_func_kwargs)
                         else:
-                            return lock_retrun
+                            return return_value
+                    else:
+                        rtn = None
             return rtn
         return wrapper
     return decorate
@@ -283,3 +305,4 @@ def watch(filename='simple.lock',
             return func(*args, **kwargs)
         return wrapper
     return decorate
+
