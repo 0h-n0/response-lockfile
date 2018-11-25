@@ -58,7 +58,7 @@ sleep() # -> 2
 
 ```test.py
 
-from simple_lock import lock
+from simple_lock import watch
 
 @watch(filename='simple.lock', path='~/locks',
                               return_value=10)
@@ -71,7 +71,7 @@ sleep() # -> 10
 
 ```test.py
 
-from simple_lock import lock
+from simple_lock import watch
 
 def add(a, b):
     return a + b
