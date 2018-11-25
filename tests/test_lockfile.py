@@ -83,7 +83,9 @@ def test_watch(tmpdir):
     # WHEN: a lockfile exists
     # THEN: watch wrapper returns value
     p = tmpdir.mkdir("sub")
-    with (p / 'lockfile.lock').open('w') as fp: pass
+    sl = SimpleLock('lockfile.lock', p)
+    sl.acquire()
+    
     @watch(filename='lockfile.lock', path=str(p))
     def wrapped_func():
         pass

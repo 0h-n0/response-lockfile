@@ -193,7 +193,7 @@ class SimpleLock(LockBase):
         if path == '.':
             path = self.root_path
         super().__init__(filename, path, threaded)
-        self._clean()
+        self.clean(filename, path)
         
     @classmethod
     def set_root_path(cls, path):
@@ -212,17 +212,19 @@ class SimpleLock(LockBase):
         _files = list(path.glob(filename + "*"))
         return bool(_files)
 
-    def _clean(self):
-        '''
-        remove a lockfile whose process-id is not in current processes.
-        '''
-        path = Path(self.path).expanduser().resolve()
+    @classmethod
+    def clean(cls, filename, path='.'):
+        if path == '.':
+            path = cls.root_path
+        path = Path(path).expanduser().resolve()
         hostname = socket.gethostname()
-        for ifile in path.glob(self.filename + self.delimiter + "*"):
-            _hostname = ifile.name.split(self.delimiter)[1]
-            pid = ifile.name.split(self.delimiter)[2]
+        for ifile in path.glob(filename + "*"):
+            print('>'*20)                        
+            print(ifile)
+            print('>'*20)            
+            _hostname = ifile.name.split(cls.delimiter)[1]
+            pid = ifile.name.split(cls.delimiter)[2]
             if hostname == _hostname:
-                # only for linux
                 if not pid in psutil.pids():
                     ifile.unlink()
 
