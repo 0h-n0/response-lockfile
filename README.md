@@ -12,9 +12,15 @@
 
 simple-lock provides lock system as a decorator or with-statement in your code. It is easy to use them.
 
-## Coencept
+## Concept
 
 You can easily implement lock system in your application with modifing a few line. There are mainly two decorator in `simple_lock`. First, `simple_lock.lock` locks function and create a lockfile. After that, other functions refer to the lockfile can't be executed normally. Second, without creating a new lockfile, `simple_lock.watch` watchs a lockfile provieded as one of arguments without creating a new lockfile. 
+
+## Instalation
+
+```shell
+$ pip install simple-lock
+```
 
 ## How to use
 
@@ -30,7 +36,7 @@ from simple_lock import lock
                               return_value=10)
 def sleep():
     import time
-    tiem.sleep(10)
+    time.sleep(10)
     
 sleep() # -> 10
 ```
@@ -49,7 +55,7 @@ def add(a, b):
                               a=1, b=1)
 def sleep():
     import time
-    tiem.sleep(10)
+    time.sleep(10)
     
 sleep() # -> 2
 ```
@@ -64,7 +70,7 @@ from simple_lock import watch
                               return_value=10)
 def sleep():
     import time
-    tiem.sleep(10)
+    time.sleep(10)
     
 sleep() # -> 10
 ```
@@ -77,11 +83,11 @@ def add(a, b):
     return a + b
 
 @watch(filename='simple.lock', path='~/locks',
-                              return_value=add
+                              return_value=add,
                               a=1, b=1)
 def sleep():
     import time
-    tiem.sleep(10)
+    time.sleep(10)
     
 sleep() # -> 2
 ```
