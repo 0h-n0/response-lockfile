@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/0h-n0/simple-lock/branch/master/graph/badge.svg)](https://codecov.io/gh/0h-n0/simple-lock)
 [![Maintainability](https://api.codeclimate.com/v1/badges/9a8b4b39d3673ccb6db6/maintainability)](https://codeclimate.com/github/0h-n0/simple-lock/maintainability)
 [![BCH compliance](https://bettercodehub.com/edge/badge/0h-n0/simple-lock?branch=master)](https://bettercodehub.com/)
-[![Downloads](https://img.shields.io/pypi/dm/simple-lock.svg](https://github.com/0h-n0/simple-lock)
+[![Downloads](https://img.shields.io/pypi/dm/simple-lock.svg)](https://github.com/0h-n0/simple-lock)
 
 
 # simple-lock
