@@ -23,7 +23,7 @@ setuptools.setup(
     url='https://github.com/0h-n0/simple-lock',
     long_description=open(os.path.join(p, 'README.md')).read(),
     packages=setuptools.find_packages(),
-    install_requires=[],
+    install_requires=['psutil'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest-cov', 'pytest-html', 'pytest', 'codecov', 'coveralls'],
     classifiers=[

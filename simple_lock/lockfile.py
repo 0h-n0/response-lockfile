@@ -10,6 +10,8 @@ import threading
 import contextlib
 from pathlib import Path
 
+import psutil
+
 
 class Error(Exception):
     """
@@ -189,7 +191,8 @@ class SimpleLock(LockBase):
         if path == '.':
             path = self.root_path
         super().__init__(filename, path, threaded)
-
+        self._clean()
+        
     @classmethod
     def set_root_path(cls, path):
         _p = Path(path).expanduser()
@@ -205,7 +208,21 @@ class SimpleLock(LockBase):
         path = Path(path).expanduser().resolve()
         _files = list(path.glob(filename + "*"))
         return bool(_files)
-        
+
+    def _clean(self):
+        '''
+        remove a lockfile whose process-id is not in current processes.
+        '''
+        path = Path(self.path).expanduser().resolve()
+        hostname = socket.gethostname()
+        for ifile in path.glob(self.filename + self.delimiter + "*"):
+            _hostname = ifile.name.split(self.delimiter)[1]
+            pid = ifile.name.split(self.delimiter)[2]
+            if hostname == _hostname:
+                # only for linux
+                if not pid in psutil.pids():
+                    ifile.unlink()
+
     def acquire(self):
         if self.is_locked():
             return False
